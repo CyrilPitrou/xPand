@@ -19,11 +19,11 @@
 
 
 
-xAct`xPand`$Version={"0.4.3",{2015,09,09}};
+xAct`xPand`$Version={"0.4.3",{2018,04,28}};
 
 
-xAct`xPand`$xTensorVersionExpected={"1.1.2",{2015,8,3}};
-xAct`xPand`$xPertVersionExpected={"1.0.5",{2014,9,28}};
+xAct`xPand`$xTensorVersionExpected={"1.1.3",{2018,2,28}};
+xAct`xPand`$xPertVersionExpected={"1.0.6",{2018,2,28}};
 
 
 (* xPand: Cosmological perturbations about homogeneous space-times *)
@@ -61,7 +61,7 @@ You should have received a copy of the GNU General Public License
 
 (* :Package Version: 0.4.3 *)
 
-(* :Copyright: Cyril Pitrou, Xavier Roy and Obinna Umeh (2012-2016) *)
+(* :Copyright: Cyril Pitrou, Xavier Roy and Obinna Umeh (2012-2018) *)
 
 (* :History: see xPand.History *)
 
@@ -2549,7 +2549,7 @@ exprtemp
 
 /.K[h][LI[0],LI[q_?IntegerQ],i1_,i2_]:>ToCanonical[Nest[LieD[n[i1]][#]&,a[h][]K[h][LI[0],LI[0],i1,i2],q],UseMetricOnVBundle->None]
 
-/.tens_?((DefProjectedTensorQ[#,h]&&#=!=K[h]&&#=!=a[h]&&#=!=H[h])&)[LI[p_],LI[q_?IntegerQ],inds___]:>ToCanonical[Nest[LieD[n[i1]][#]&,tens[LI[p],LI[0],inds],q],UseMetricOnVBundle->None]
+/.tens_?((DefProjectedTensorQ[#,h]&&#=!=K[h]&&#=!=a[h]&&#=!=H[h])&)[LI[p_],LI[q_?IntegerQ],inds___]:>(ToCanonical[Nest[LieD[n[i1]][#]&,tens[LI[p],LI[0],inds],q],UseMetricOnVBundle->None])
 ];
 (*$ConformalTime=True;*)
 res
@@ -2568,11 +2568,11 @@ exprtemp=expr(*/.Tens_?((DefProjectedTensorQ[#,h])&)[LI[p_],LI[q_],inds___]\[Rul
 
 res=PostProcess[h]@NoScalar@SameDummies@ToCanonical@ContractMetric[
 exprtemp
-/.H[h][LI[0],LI[q_?IntegerQ]]:>ToCanonical[Nest[LieD[n[i1]][#]&,1/a[h][]*H[h][LI[0],LI[0]],q],UseMetricOnVBundle->None]
+/.H[h][LI[0],LI[q_?IntegerQ]]:>ToCanonical[Nest[(*It is this factor of 1/a which was forgotten *)1/a[h][]LieD[n[i1]][#]&,1/a[h][]*H[h][LI[0],LI[0]],q],UseMetricOnVBundle->None]
 
-/.K[h][LI[0],LI[q_?IntegerQ],i1_,i2_]:>ToCanonical[Nest[LieD[n[i1]][#]&,1/a[h][]K[h][LI[0],LI[0],i1,i2],q],UseMetricOnVBundle->None]
+/.K[h][LI[0],LI[q_?IntegerQ],i1_,i2_]:>ToCanonical[Nest[(*It is this factor of 1/a which was forgotten and lead to the bug *)1/a[h][]LieD[n[i1]][#]&,1/a[h][]K[h][LI[0],LI[0],i1,i2],q],UseMetricOnVBundle->None]
 
-/.tens_?((DefProjectedTensorQ[#,h]&&#=!=K[h]&&#=!=a[h]&&#=!=H[h])&)[LI[p_],LI[q_?IntegerQ],inds___]:>ToCanonical[Nest[1/a[h][]LieD[n[i1]][#]&,tens[LI[p],LI[0],inds],q],UseMetricOnVBundle->None]
+/.tens_?((DefProjectedTensorQ[#,h]&&#=!=K[h]&&#=!=a[h]&&#=!=H[h])&)[LI[p_],LI[q_?IntegerQ],inds___]:>(ToCanonical[Nest[1/a[h][]LieD[n[i1]][#]&,tens[LI[p],LI[0],inds],q],UseMetricOnVBundle->None])
 
 ];
 (*$ConformalTime=False;*)
@@ -2688,7 +2688,7 @@ With[{CD=CovDOfMetric[g],cd=CovDOfMetric[h],M=ManifoldOfCovD@CovDOfMetric[g]},
 With[{CDmax=MaxDerOrder[expr,CD,First@replacerule]},
 
 (* In this function we will precompute the rules for the CovDs of tensor for which the rule is given in the argument replacerule.
-For instance if we compute the perturbation of the Ricci tensor, there will be several terms with two covariant derivatives of the perturbed metric. By precomputing the rule once instead of several times, we shall save sone computing time. *)
+For instance if we compute the perturbation of the Ricci tensor, there will be several terms with two covariant derivatives of the perturbed metric. By precomputing the rule once instead of several times, we shall save some computing time. *)
 
 dummiesup=DummyIn/@Table[Tangent[M],{Range[CDmax]}];
 dummiesdown=ChangeIndex/@dummiesup;
